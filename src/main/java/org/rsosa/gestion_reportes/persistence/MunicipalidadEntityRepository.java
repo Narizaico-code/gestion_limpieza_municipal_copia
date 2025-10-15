@@ -1,6 +1,7 @@
 package org.rsosa.gestion_reportes.persistence;
 
 import org.rsosa.gestion_reportes.dominio.dto.MunicipalidadDto;
+import org.rsosa.gestion_reportes.dominio.exception.MunicipalidadYaExisteException;
 import org.rsosa.gestion_reportes.dominio.repository.MunicipalidadRepository;
 import org.rsosa.gestion_reportes.persistence.crud.CrudMunicipalidadEntity;
 import org.rsosa.gestion_reportes.persistence.entity.Municipalidad;
@@ -35,9 +36,13 @@ public class MunicipalidadEntityRepository implements MunicipalidadRepository {
 
     @Override
     public MunicipalidadDto guardarMunicipalidad(MunicipalidadDto municipalidadDto) {
-        Municipalidad entidad = municipalidadMapper.toEntity(municipalidadDto);
-        Municipalidad guardada = crudMunicipalidadEntity.save(entidad);
-        return municipalidadMapper.toDto(guardada);
+        if (this.crudMunicipalidadEntity.findByZona(municipalidadDto.zone()).isPresent()) {
+            throw new MunicipalidadYaExisteException(municipalidadDto.zone());
+        }
+
+        Municipalidad municipalidad = this.municipalidadMapper.toEntity(municipalidadDto);
+        municipalidad = this.crudMunicipalidadEntity.save(municipalidad);
+        return this.municipalidadMapper.toDto(municipalidad);
     }
 
     @Override

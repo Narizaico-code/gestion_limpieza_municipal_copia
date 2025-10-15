@@ -19,7 +19,7 @@ public class TrabajadorMunicipalidad {
     @JoinColumn(name = "codigo_personal", nullable = false)
     private Personal personal;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "codigo_municipalidad", nullable = false)
     private Municipalidad municipalidad;
 

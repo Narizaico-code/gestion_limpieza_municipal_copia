@@ -2,7 +2,7 @@ package org.rsosa.gestion_reportes.dominio.dto;
 
 import org.rsosa.gestion_reportes.dominio.PersonalEnum;
 
-public record   PersonalDto (
+public record PersonalDto (
     Long personal_id,
     String name,
     String lastname,

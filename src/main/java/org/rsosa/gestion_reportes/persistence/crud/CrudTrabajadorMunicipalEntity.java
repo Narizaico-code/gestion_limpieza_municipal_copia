@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface CrudTrabajadorMunicipalEntity extends CrudRepository<TrabajadorMunicipalidad, Long> {
-    Optional<TrabajadorMunicipalidad> findByPersonal_CodigoPersonal(Long codigoPersonal);
-
+    List<TrabajadorMunicipalidad> findByPersonal_CodigoPersonal(Long codigoPersonal);  // ← Cambia a List
     List<TrabajadorMunicipalidad> findByMunicipalidad_CodigoMunicipalidad(Long codigoMunicipalidad);
+    List<TrabajadorMunicipalidad> findByMunicipalidad_Zona(String zona);
 }

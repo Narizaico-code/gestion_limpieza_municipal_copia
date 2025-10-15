@@ -17,23 +17,23 @@ public class Reporte {
     private String descripcion;
     private String zona;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "codigo_estado", nullable = false)
     private Estado estado;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "codigo_vecino")
     private Vecino vecino;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "codigo_personal")
     private Personal personalAsignado;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "codigo_admin")
     private Administrador administradorAsignado;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "codigo_tipo_reporte", nullable = false)
     private TipoReporte tipoReporte;
 }

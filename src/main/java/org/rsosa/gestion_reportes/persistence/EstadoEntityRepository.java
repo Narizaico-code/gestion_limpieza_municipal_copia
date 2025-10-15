@@ -50,7 +50,7 @@ public class EstadoEntityRepository implements EstadoRepository {
     @Override
     public EstadoDto guardarEstado(EstadoDto estadoDto) {
         String nombre = String.valueOf(estadoDto.name()).toUpperCase();
-        if (this.crudEstadoEntity.findByNombre(nombre) != null){
+        if (!this.crudEstadoEntity.findByNombre(nombre).isEmpty()){
             throw new EstadoYaExisteException(nombre);
         }
         Estado estado = this.estadoMapper.toEntity(estadoDto);

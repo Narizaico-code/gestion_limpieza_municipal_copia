@@ -20,7 +20,7 @@ public class ContratacionService {
     }
 
     public ContratacionDto obtenerContratacionPorId(Long id) {
-        return this.contratacionRepository.obtenerContratacionPorId(id);
+        return this.contratacionRepository.obtenerPorCodigo(id);
     }
 
     public ContratacionDto guardarContratacion(ContratacionDto contratacionDto) {
@@ -33,5 +33,9 @@ public class ContratacionService {
 
     public void eliminarContratacion(Long id) {
         this.contratacionRepository.eliminarContratacion(id);
+    }
+
+    public ContratacionDto obtenerPorCodigo(Long contratacionId) {
+        return this.contratacionRepository.obtenerPorCodigo(contratacionId);
     }
 }

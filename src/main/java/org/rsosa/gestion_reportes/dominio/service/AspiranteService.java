@@ -19,8 +19,8 @@ public class AspiranteService {
         return this.aspiranteRepository.obtenerTodo();
     }
 
-    public AspiranteDto obtenerAspirantePorId(Long id) {
-        return this.aspiranteRepository.obtenerAspirantePorId(id);
+    public AspiranteDto obtenerPorCodigo(Long id) {
+        return this.aspiranteRepository.obtenerPorCodigo(id);
     }
 
     public AspiranteDto guardarAspirante(AspiranteDto aspiranteDto) {
@@ -34,4 +34,6 @@ public class AspiranteService {
     public void eliminarAspirante(Long id) {
         this.aspiranteRepository.eliminarAspirante(id);
     }
+
+
 }

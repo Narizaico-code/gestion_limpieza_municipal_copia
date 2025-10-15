@@ -1,6 +1,7 @@
 package org.rsosa.gestion_reportes.persistence;
 
 import org.rsosa.gestion_reportes.dominio.dto.TipoReporteDto;
+import org.rsosa.gestion_reportes.dominio.exception.CatalogoInvalidoException;
 import org.rsosa.gestion_reportes.dominio.repository.TipoReporteRepository;
 import org.rsosa.gestion_reportes.persistence.crud.CrudTipoReporteEntity;
 import org.rsosa.gestion_reportes.persistence.entity.TipoReporte;
@@ -14,22 +15,20 @@ public class TipoReporteEntityRepository implements TipoReporteRepository {
     private final CrudTipoReporteEntity crudTipoReporteEntity;
     private final TipoReporteMapper tipoReporteMapper;
 
-    public TipoReporteEntityRepository(CrudTipoReporteEntity crudTipoReporteEntity, TipoReporteMapper tipoReporteMapper){
+    public TipoReporteEntityRepository(CrudTipoReporteEntity crudTipoReporteEntity, TipoReporteMapper tipoReporteMapper) {
         this.crudTipoReporteEntity = crudTipoReporteEntity;
         this.tipoReporteMapper = tipoReporteMapper;
     }
 
     @Override
     public List<TipoReporteDto> obtenerTodo() {
-        return tipoReporteMapper.toDto(crudTipoReporteEntity.findAll());
+        return this.tipoReporteMapper.toDto(this.crudTipoReporteEntity.findAll());
     }
 
     @Override
     public TipoReporteDto obtenerTipoReportePorCodigo(Long id) {
-        TipoReporte tipoReporte = this.crudTipoReporteEntity.findById(id).orElse(null);
-        if (tipoReporte == null) {
-            return null;
-        }
+        TipoReporte tipoReporte = this.crudTipoReporteEntity.findById(id)
+                .orElseThrow(() -> new CatalogoInvalidoException("Tipo de Reporte con código " + id + " no existe"));
         return this.tipoReporteMapper.toDto(tipoReporte);
     }
 
@@ -39,21 +38,20 @@ public class TipoReporteEntityRepository implements TipoReporteRepository {
         tipoReporte = this.crudTipoReporteEntity.save(tipoReporte);
         return this.tipoReporteMapper.toDto(tipoReporte);
     }
+
     @Override
     public TipoReporteDto actualizarTipoReporte(Long id, TipoReporteDto tipoReporteDto) {
-        TipoReporte tipoReporte = this.crudTipoReporteEntity.findById(id).orElse(null);
-        if (tipoReporte == null) {
-            return null;
-        } else {
-            this.tipoReporteMapper.updateEntityFromDto(tipoReporteDto, tipoReporte);
-            tipoReporte = this.crudTipoReporteEntity.save(tipoReporte);
-            return this.tipoReporteMapper.toDto(tipoReporte);
-        }
+        TipoReporte tipoReporte = this.crudTipoReporteEntity.findById(id)
+                .orElseThrow(() -> new CatalogoInvalidoException("Tipo de Reporte con código " + id + " no existe"));
+        this.tipoReporteMapper.updateEntityFromDto(tipoReporteDto, tipoReporte);
+        tipoReporte = this.crudTipoReporteEntity.save(tipoReporte);
+        return this.tipoReporteMapper.toDto(tipoReporte);
     }
+
     @Override
     public void eliminarTipoReporte(Long id) {
+        TipoReporte tipoReporte = this.crudTipoReporteEntity.findById(id)
+                .orElseThrow(() -> new CatalogoInvalidoException("Tipo de Reporte con código " + id + " no existe"));
         this.crudTipoReporteEntity.deleteById(id);
     }
 }
-
-

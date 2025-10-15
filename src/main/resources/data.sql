@@ -1,0 +1,1 @@
+INSERT IGNORE INTO estados(nombre) values("PENDIENTE");

@@ -6,8 +6,9 @@ import java.util.List;
 
 public interface ContratacionRepository {
     List<ContratacionDto> obtenerTodo();
-    ContratacionDto obtenerContratacionPorId(Long id);
+    ContratacionDto obtenerPorCodigo(Long id);
     ContratacionDto guardarContratacion(ContratacionDto contratacionDto);
     ContratacionDto actualizarContratacion(Long id, ContratacionDto contratacionDto);
     void eliminarContratacion(Long id);
+    List<ContratacionDto> obtenerPorMunicipalidad(Long codigoMunicipalidad);
 }

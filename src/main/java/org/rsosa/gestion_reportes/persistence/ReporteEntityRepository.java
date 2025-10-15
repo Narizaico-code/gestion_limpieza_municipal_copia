@@ -1,6 +1,5 @@
 package org.rsosa.gestion_reportes.persistence;
 
-
 import jakarta.transaction.Transactional;
 import org.rsosa.gestion_reportes.dominio.dto.ModReporteDto;
 import org.rsosa.gestion_reportes.dominio.dto.ReporteDto;
@@ -15,7 +14,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public class ReporteEntityRepository implements ReporteRepository{
+public class ReporteEntityRepository implements ReporteRepository {
     private final CrudReporteEntity crudReporteEntity;
     private final CrudPersonalEntity crudPersonalEntity;
     private final CrudContratacionEntity crudContratacionEntity;
@@ -24,9 +23,9 @@ public class ReporteEntityRepository implements ReporteRepository{
     private final CrudEstadoEntity crudEstadoEntity;
     private final CrudVecinoEntity crudVecinoEntity;
     private final CrudTipoReporteEntity crudTipoReporteEntity;
-    private final CrudMunicipalidadEntity crudMunicipalidadEntity; // Necesario para buscar la zona
-    private final CrudAdministradorEntity crudAdministradorEntity; // Necesario para buscar el Administrador
-    private final CrudTrabajadorMunicipalEntity crudTrabajadorMunicipalidadEntity; // Para buscar el Administrador en la zona
+    private final CrudMunicipalidadEntity crudMunicipalidadEntity;
+    private final CrudAdministradorEntity crudAdministradorEntity;
+    private final CrudAdministradorMunicipalidadEntity crudAdminMunicipalidadEntity;
 
     public ReporteEntityRepository(
             CrudReporteEntity crudReporteEntity,
@@ -37,8 +36,9 @@ public class ReporteEntityRepository implements ReporteRepository{
             CrudEstadoEntity crudEstadoEntity,
             CrudVecinoEntity crudVecinoEntity,
             CrudTipoReporteEntity crudTipoReporteEntity,
-            CrudMunicipalidadEntity crudMunicipalidadEntity, // Nueva inyección
-            CrudAdministradorEntity crudAdministradorEntity // Nueva inyección
+            CrudMunicipalidadEntity crudMunicipalidadEntity,
+            CrudAdministradorEntity crudAdministradorEntity,
+            CrudAdministradorMunicipalidadEntity crudAdminMunicipalidadEntity
     ) {
         this.crudReporteEntity = crudReporteEntity;
         this.crudPersonalEntity = crudPersonalEntity;
@@ -50,7 +50,7 @@ public class ReporteEntityRepository implements ReporteRepository{
         this.crudTipoReporteEntity = crudTipoReporteEntity;
         this.crudMunicipalidadEntity = crudMunicipalidadEntity;
         this.crudAdministradorEntity = crudAdministradorEntity;
-        this.crudTrabajadorMunicipalidadEntity = crudTrabajadorMunicipalEntity;
+        this.crudAdminMunicipalidadEntity = crudAdminMunicipalidadEntity;
     }
 
     @Override
@@ -80,7 +80,7 @@ public class ReporteEntityRepository implements ReporteRepository{
 
     @Override
     public ReporteDto obtenerReportePorCodigo(Long id) {
-         Reporte reporte = this.crudReporteEntity.findById(id)
+        Reporte reporte = this.crudReporteEntity.findById(id)
                 .orElseThrow(() -> new ReporteNoExisteException(id));
         return this.reporteMapper.toDto(reporte);
     }
@@ -88,6 +88,9 @@ public class ReporteEntityRepository implements ReporteRepository{
     @Override
     @Transactional
     public ReporteDto guardarReporte(ReporteDto reporteDto) {
+        if (reporteDto.zone() == null || reporteDto.zone().isBlank()) {
+            throw new ZonaInvalidaException("La zona del reporte es obligatoria y no puede estar vacía.");
+        }
 
         Reporte reporte = this.reporteMapper.toEntity(reporteDto);
 
@@ -112,23 +115,15 @@ public class ReporteEntityRepository implements ReporteRepository{
         reporte.setEstado(estadoPendiente);
 
         String zona = reporte.getZona();
-        Municipalidad municipalidad = crudMunicipalidadEntity.findByZona(zona)
+        Municipalidad municipalidad = this.crudMunicipalidadEntity.findByZona(zona)
                 .orElseThrow(() -> new ZonaInvalidaException("No se encontró Municipalidad asignada a la zona: " + zona));
 
-        Optional<TrabajadorMunicipalidad> adminTrabajadorOpt = crudTrabajadorMunicipalidadEntity
-                .findByMunicipalidad_CodigoMunicipalidad(municipalidad.getCodigoMunicipalidad())
-                .stream()
-                .filter(tm -> tm.getPersonal() != null && crudAdministradorEntity.existsById(tm.getPersonal().getCodigoPersonal()))
-                .findFirst();
+        Optional<AdministradorMunicipalidad> adminMunicipalidadOpt = this.crudAdminMunicipalidadEntity
+                .findByMunicipalidad_CodigoMunicipalidad(municipalidad.getCodigoMunicipalidad());
 
-        if (adminTrabajadorOpt.isPresent()) {
-            Long codigoAdmin = adminTrabajadorOpt.get().getPersonal().getCodigoPersonal();
-            Administrador administradorAsignado = crudAdministradorEntity.findById(codigoAdmin)
-                    .orElse(null);
-
-            reporte.setAdministradorAsignado(administradorAsignado);
-        } else {
-            System.out.println("ADVERTENCIA: No se encontró Administrador asignado a la Municipalidad de la zona " + reporte.getZona() + ". El campo quedará NULL.");
+        if (adminMunicipalidadOpt.isPresent()) {
+            Administrador administrador = adminMunicipalidadOpt.get().getAdministrador();
+            reporte.setAdministradorAsignado(administrador);
         }
 
         reporte = this.crudReporteEntity.save(reporte);
@@ -144,10 +139,29 @@ public class ReporteEntityRepository implements ReporteRepository{
         if (modReporteDto.staff() != null && modReporteDto.staff().personal_id() != null) {
             Long codigoNuevoPersonal = modReporteDto.staff().personal_id();
 
-            Personal nuevoPersonal = crudPersonalEntity.findById(codigoNuevoPersonal)
+            Personal nuevoPersonal = this.crudPersonalEntity.findById(codigoNuevoPersonal)
                     .orElseThrow(() -> new PersonalNoExisteException(codigoNuevoPersonal));
 
-            TrabajadorMunicipalidad relacionTrabajador = crudTrabajadorMunicipalEntity.findByPersonal_CodigoPersonal(codigoNuevoPersonal)
+            // DEBUG: Obtener todos los TrabajadorMunicipalidad del Personal
+            List<TrabajadorMunicipalidad> trabajadoresDelPersonal = this.crudTrabajadorMunicipalEntity
+                    .findByPersonal_CodigoPersonal(codigoNuevoPersonal);
+
+            System.out.println("====== DEBUG ======");
+            System.out.println("Personal ID: " + codigoNuevoPersonal);
+            System.out.println("Zona del Reporte: '" + reporte.getZona() + "'");
+            System.out.println("Total TrabajadorMunicipalidad encontrados: " + trabajadoresDelPersonal.size());
+
+            trabajadoresDelPersonal.forEach(tm -> {
+                System.out.println("  - Zona en BD: '" + tm.getMunicipalidad().getZona() + "'");
+                System.out.println("    ¿Coincide? " + tm.getMunicipalidad().getZona().equalsIgnoreCase(reporte.getZona()));
+            });
+            System.out.println("==================");
+
+            // Buscar el que coincida con la zona
+            TrabajadorMunicipalidad relacionTrabajador = trabajadoresDelPersonal
+                    .stream()
+                    .filter(tm -> tm.getMunicipalidad().getZona().equalsIgnoreCase(reporte.getZona()))
+                    .findFirst()
                     .orElseThrow(() -> new TrabajadorSinZonaException(codigoNuevoPersonal));
 
             String zonaPersonal = relacionTrabajador.getMunicipalidad().getZona();
@@ -157,39 +171,33 @@ public class ReporteEntityRepository implements ReporteRepository{
             }
 
             if (!nuevoPersonal.getEstado().equalsIgnoreCase("Libre")) {
-                Iterable<Contratacion> vacanteActivaOpt = crudContratacionEntity.findByMunicipalidad_ZonaAndVacantesDisponiblesGreaterThan(reporte.getZona(), 0);
+                Municipalidad municipalidad = this.crudMunicipalidadEntity.findByZona(reporte.getZona())
+                        .orElseThrow(() -> new CatalogoInvalidoException("Municipalidad no encontrada para la zona: " + reporte.getZona()));
 
-                if (vacanteActivaOpt == null) {
-                    Municipalidad municipalidadZona = crudMunicipalidadEntity.findByZona(reporte.getZona())
-                            .orElseThrow(() -> new CatalogoInvalidoException("Municipalidad no encontrada para la zona: " + reporte.getZona()));
+                Contratacion nuevaContratacion = new Contratacion();
+                nuevaContratacion.setSalario(600.00);
+                nuevaContratacion.setVacante("Técnico de Campo");
+                nuevaContratacion.setMunicipalidad(municipalidad);
+                nuevaContratacion.setVacantesDisponibles(1);
 
-                    Contratacion nuevaContratacion = new Contratacion();
-                    nuevaContratacion.setSalario("Pendiente");
-                    nuevaContratacion.setVacante("Técnico de Campo");
-                    nuevaContratacion.setMunicipalidad(municipalidadZona);
-                    nuevaContratacion.setVacantesDisponibles(1); // Configuramos 1 vacante
+                this.crudContratacionEntity.save(nuevaContratacion);
 
-                    this.crudContratacionEntity.save(nuevaContratacion); // Guardar la nueva entidad de Contratación
-
-                    throw new PersonalOcupadoException("ASIGNACIÓN FALLIDA: Personal ocupado. SE HA CREADO UNA NUEVA VACANTE EN LA ZONA. Avise a RRHH.");
-                } else {
-                    throw new PersonalOcupadoException("ASIGNACIÓN FALLIDA: El personal seleccionado ya está 'Asignado'. Existe una vacante activa en la zona, espere a la contratación.");
-                }
+                throw new PersonalOcupadoException("ASIGNACIÓN FALLIDA: El personal está ocupado. SE HA CREADO UNA NUEVA VACANTE AUTOMÁTICAMENTE. Avise a RRHH para contratar aspirantes.");
             }
 
             nuevoPersonal.setEstado("Asignado");
             this.crudPersonalEntity.save(nuevoPersonal);
 
             reporte.setPersonalAsignado(nuevoPersonal);
-            Estado estadoReporteAsignado = this.crudEstadoEntity.findByNombre("ASIGNADO")
+
+            Estado estadoAsignado = this.crudEstadoEntity.findByNombre("ASIGNADO")
                     .orElseThrow(() -> new CatalogoInvalidoException("El estado 'ASIGNADO' no existe en el catálogo."));
-            reporte.setEstado(estadoReporteAsignado);
+            reporte.setEstado(estadoAsignado);
         }
 
         if (modReporteDto.state() != null && modReporteDto.state().state_id() != null) {
             Estado nuevoEstado = this.crudEstadoEntity.findById(modReporteDto.state().state_id())
-                    .orElseThrow(() -> new EstadoInvalidoException("El código de Estado de Reporte " + modReporteDto.state().state_id() + " es inválido. Verifique el catálogo."));
-
+                    .orElseThrow(() -> new EstadoInvalidoException("El código de Estado " + modReporteDto.state().state_id() + " es inválido."));
             reporte.setEstado(nuevoEstado);
         }
 
@@ -199,11 +207,8 @@ public class ReporteEntityRepository implements ReporteRepository{
 
     @Override
     public void eliminarReporte(Long id) {
-        Reporte reporte = this.crudReporteEntity.findById(id).orElse(null);
-        if (reporte == null){
-            throw new ReporteNoExisteException(id);
-        }else {
-            this.crudReporteEntity.deleteById(id);
-        }
+        Reporte reporte = this.crudReporteEntity.findById(id)
+                .orElseThrow(() -> new ReporteNoExisteException(id));
+        this.crudReporteEntity.deleteById(id);
     }
 }

@@ -22,7 +22,11 @@ public interface PersonalMapper {
 
     List<PersonalDto> toDto(List<Personal> entities);
 
-    @InheritInverseConfiguration
+    @Mapping(source = "personal_id", target = "codigoPersonal")
+    @Mapping(source = "name", target = "nombre")
+    @Mapping(source = "lastname", target = "apellido")
+    @Mapping(source = "number", target = "telefono")
+    @Mapping(source = "email", target = "correo")
     @Mapping(source = "state", target = "estado", qualifiedByName = "generarEstado")
     Personal toEntity(PersonalDto personalDto);
     void updateEntityFromDto(PersonalDto dto, @MappingTarget Personal entity);

@@ -6,20 +6,20 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "Contrataciones")
+@Table(name = "administrador_municipalidad", uniqueConstraints = {
+        @UniqueConstraint(columnNames = {"admin_id", "codigo_municipalidad"})
+})
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Contratacion {
+public class AdministradorMunicipalidad {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "codigo_contratación")
-    private Long codigoContratacion;
-    @Column(nullable = false)
-    private Double salario;
-    @Column(nullable = false)
-    private String vacante;
-    private Integer vacantesDisponibles;
+    private Long codigoAdminMunicipalidad;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "admin_id", nullable = false)
+    private Administrador administrador;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "codigo_municipalidad", nullable = false)

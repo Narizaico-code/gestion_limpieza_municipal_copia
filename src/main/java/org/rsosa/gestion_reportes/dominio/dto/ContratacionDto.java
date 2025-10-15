@@ -6,10 +6,10 @@ import jakarta.validation.constraints.NotNull;
 
 public record ContratacionDto (
         Long hiring_id,
-        @NotBlank(message = "El salario no puede estar vacío.")
-        double salary,
+        @NotNull(message = "El salario no puede estar vacío.")
+        Double salary,
         @NotBlank(message = "El nombre de la vacante no puede estar vacío.")
-        int vacancy,
+        String vacancy,
         @NotNull(message = "Debe especificar el número de vacantes disponibles.")
         @Min(value = 1, message = "Debe haber al menos 1 vacante disponible.")
         Integer available_vaca,

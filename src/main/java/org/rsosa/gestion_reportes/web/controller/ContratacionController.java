@@ -1,7 +1,10 @@
 package org.rsosa.gestion_reportes.web.controller;
 
-import org.rsosa.gestion_reportes.dominio.service.ContratacionService;
+import jakarta.validation.Valid;
 import org.rsosa.gestion_reportes.dominio.dto.ContratacionDto;
+import org.rsosa.gestion_reportes.dominio.exception.CatalogoInvalidoException;
+import org.rsosa.gestion_reportes.persistence.ContratacionEntityRepository;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -10,44 +13,59 @@ import java.util.List;
 @RestController
 @RequestMapping("/v1/contrataciones")
 public class ContratacionController {
-    private final ContratacionService contratacionService;
 
-    public ContratacionController(ContratacionService contratacionService) {
-        this.contratacionService = contratacionService;
+    private final ContratacionEntityRepository repository;
+
+    public ContratacionController(ContratacionEntityRepository repository) {
+        this.repository = repository;
     }
 
     @GetMapping
     public ResponseEntity<List<ContratacionDto>> obtenerTodo() {
-        return ResponseEntity.ok(this.contratacionService.obtenerTodo());
+        return ResponseEntity.ok(this.repository.obtenerTodo());
     }
 
-    @GetMapping("{id}")
-    public ResponseEntity<ContratacionDto> obtenerContratacionPorId(@PathVariable Long id) {
-        var contratacion = this.contratacionService.obtenerContratacionPorId(id);
-        if (contratacion == null) {
-            return ResponseEntity.notFound().build();
+    @GetMapping("/{id}")
+    public ResponseEntity<?> obtenerPorCodigo(@PathVariable Long id) {
+        try {
+            return ResponseEntity.ok(this.repository.obtenerPorCodigo(id));
+        } catch (CatalogoInvalidoException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }
-        return ResponseEntity.ok(contratacion);
+    }
+
+    @GetMapping("/municipalidad/{codigoMunicipalidad}")
+    public ResponseEntity<List<ContratacionDto>> obtenerPorMunicipalidad(@PathVariable Long codigoMunicipalidad) {
+        return ResponseEntity.ok(this.repository.obtenerPorMunicipalidad(codigoMunicipalidad));
     }
 
     @PostMapping
-    public ResponseEntity<ContratacionDto> guardarContratacion(@RequestBody ContratacionDto contratacionDto) {
-        var contratacionGuardada = this.contratacionService.guardarContratacion(contratacionDto);
-        return ResponseEntity.ok(contratacionGuardada);
-    }
-
-    @PutMapping("{id}")
-    public ResponseEntity<ContratacionDto> actualizarContratacion(@PathVariable Long id, @RequestBody ContratacionDto contratacionDto) {
-        var contratacionActualizada = this.contratacionService.actualizarContratacion(id, contratacionDto);
-        if (contratacionActualizada == null) {
-            return ResponseEntity.notFound().build();
+    public ResponseEntity<?> guardarContratacion(@RequestBody @Valid ContratacionDto contratacionDto) {
+        try {
+            ContratacionDto resultado = this.repository.guardarContratacion(contratacionDto);
+            return ResponseEntity.status(HttpStatus.CREATED).body(resultado);
+        } catch (CatalogoInvalidoException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
-        return ResponseEntity.ok(contratacionActualizada);
     }
 
-    @DeleteMapping("{id}")
-    public ResponseEntity<Void> eliminarContratacion(@PathVariable Long id) {
-        this.contratacionService.eliminarContratacion(id);
-        return ResponseEntity.noContent().build();
+    @PutMapping("/{id}")
+    public ResponseEntity<?> actualizarContratacion(@PathVariable Long id, @RequestBody @Valid ContratacionDto contratacionDto) {
+        try {
+            ContratacionDto resultado = this.repository.actualizarContratacion(id, contratacionDto);
+            return ResponseEntity.ok(resultado);
+        } catch (CatalogoInvalidoException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        }
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> eliminarContratacion(@PathVariable Long id) {
+        try {
+            this.repository.eliminarContratacion(id);
+            return ResponseEntity.noContent().build();
+        } catch (CatalogoInvalidoException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        }
     }
 }

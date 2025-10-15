@@ -11,7 +11,7 @@ import org.rsosa.gestion_reportes.persistence.entity.TipoReporte;
 
 import java.util.List;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", uses = {MunicipalidadMapper.class})
 public interface ContratacionMapper {
     @Mapping(source = "codigoContratacion", target = "hiring_id")
     @Mapping(source = "salario", target = "salary")
