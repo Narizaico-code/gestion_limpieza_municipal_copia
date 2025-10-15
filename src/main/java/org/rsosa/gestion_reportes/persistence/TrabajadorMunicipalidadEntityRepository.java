@@ -49,12 +49,12 @@ public class TrabajadorMunicipalidadEntityRepository implements TrabajadorMunici
     @Override
     public TrabajadorMunicipalDto guardarTrabajadorMunicipalidad(TrabajadorMunicipalDto trabajadorMunicipalDto) {
         // Validar que Personal existe
-        Personal personal = this.crudPersonalEntity.findById(trabajadorMunicipalDto.staff().personal_id())
-                .orElseThrow(() -> new CatalogoInvalidoException("Personal con código " + trabajadorMunicipalDto.staff().personal_id() + " no existe."));
+        Personal personal = this.crudPersonalEntity.findById(trabajadorMunicipalDto.staff().personalId())
+                .orElseThrow(() -> new CatalogoInvalidoException("Personal con código " + trabajadorMunicipalDto.staff().personalId() + " no existe."));
 
         // Validar que Municipalidad existe
-        Municipalidad municipalidad = this.crudMunicipalidadEntity.findById(trabajadorMunicipalDto.municipality().municipality_id())
-                .orElseThrow(() -> new CatalogoInvalidoException("Municipalidad con código " + trabajadorMunicipalDto.municipality().municipality_id() + " no existe."));
+        Municipalidad municipalidad = this.crudMunicipalidadEntity.findById(trabajadorMunicipalDto.municipality().municipalityId())
+                .orElseThrow(() -> new CatalogoInvalidoException("Municipalidad con código " + trabajadorMunicipalDto.municipality().municipalityId() + " no existe."));
 
         TrabajadorMunicipalidad trabajadorMunicipalidad = this.trabajadorMunicipalidadMapper.toEntity(trabajadorMunicipalDto);
         trabajadorMunicipalidad.setPersonal(personal);
@@ -70,16 +70,16 @@ public class TrabajadorMunicipalidadEntityRepository implements TrabajadorMunici
                 .orElseThrow(() -> new CatalogoInvalidoException("Trabajador Municipal con código " + id + " no existe."));
 
         // Validar y actualizar Personal si se proporciona
-        if (trabajadorMunicipalDto.staff() != null && trabajadorMunicipalDto.staff().personal_id() != null) {
-            Personal personal = this.crudPersonalEntity.findById(trabajadorMunicipalDto.staff().personal_id())
-                    .orElseThrow(() -> new CatalogoInvalidoException("Personal con código " + trabajadorMunicipalDto.staff().personal_id() + " no existe."));
+        if (trabajadorMunicipalDto.staff() != null && trabajadorMunicipalDto.staff().personalId() != null) {
+            Personal personal = this.crudPersonalEntity.findById(trabajadorMunicipalDto.staff().personalId())
+                    .orElseThrow(() -> new CatalogoInvalidoException("Personal con código " + trabajadorMunicipalDto.staff().personalId() + " no existe."));
             trabajadorMunicipalidad.setPersonal(personal);
         }
 
         // Validar y actualizar Municipalidad si se proporciona
-        if (trabajadorMunicipalDto.municipality() != null && trabajadorMunicipalDto.municipality().municipality_id() != null) {
-            Municipalidad municipalidad = this.crudMunicipalidadEntity.findById(trabajadorMunicipalDto.municipality().municipality_id())
-                    .orElseThrow(() -> new CatalogoInvalidoException("Municipalidad con código " + trabajadorMunicipalDto.municipality().municipality_id() + " no existe."));
+        if (trabajadorMunicipalDto.municipality() != null && trabajadorMunicipalDto.municipality().municipalityId() != null) {
+            Municipalidad municipalidad = this.crudMunicipalidadEntity.findById(trabajadorMunicipalDto.municipality().municipalityId())
+                    .orElseThrow(() -> new CatalogoInvalidoException("Municipalidad con código " + trabajadorMunicipalDto.municipality().municipalityId() + " no existe."));
             trabajadorMunicipalidad.setMunicipalidad(municipalidad);
         }
 

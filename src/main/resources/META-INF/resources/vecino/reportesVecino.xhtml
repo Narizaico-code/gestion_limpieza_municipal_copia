@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<h:html xmlns="http://www.w3.org/1999/xhtml"
+        xmlns:h="http://xmlns.jcp.org/jsf/html"
+        xmlns:f="http://xmlns.jcp.org/jsf/core"
+        xmlns:p="http://primefaces.org/ui">
+    <h:head>
+        <title>Mis Reportes</title>
+        <link rel="stylesheet" href="https://unpkg.com/primeflex@latest/primeflex.css"/>
+        <link rel="stylesheet" href="https://unpkg.com/primeflex@latest/themes/primeone-dark.css"/>
+        <style>
+            .dialog-field {
+                margin-bottom: 20px;
+            }
+            .dialog-field label {
+                display: block;
+                margin-bottom: 8px;
+                font-weight: bold;
+            }
+            .dialog-field .ui-inputfield,
+            .dialog-field .ui-selectonemenu {
+                width: 100%;
+            }
+            .dialog-buttons {
+                margin-top: 20px;
+                text-align: right;
+            }
+            .dialog-buttons .ui-button {
+                margin-left: 10px;
+            }
+        </style>
+    </h:head>
+    <h:body style="background: #f5f5f5; min-height: 100vh;">
+        <div class="p-4">
+            <!-- Header -->
+            <div class="border-round p-shadow-3 p-4 mb-4" style="background-color: white;">
+                <div class="flex justify-content-between align-items-center">
+                    <h1 class="text-3xl font-bold" style="color: #333;">
+                        <i class="pi pi-file-edit mr-2" style="color: #667eea;"></i>
+                        Gestión de Reportes
+                    </h1>
+                    <p:button value="Volver al Menú"
+                              icon="pi pi-arrow-left"
+                              outcome="menuVecino.xhtml"
+                              styleClass="p-button-secondary"/>
+                </div>
+            </div>
+
+            <!-- Tabs -->
+            <h:form id="formReportes">
+                <p:messages id="messages" showDetail="true"/>
+
+                <p:tabView>
+                    <!-- Tab 1: MIS REPORTES -->
+                    <p:tab title="Mis Reportes">
+                        <div class="mb-3">
+                            <p:commandButton value="Crear Nuevo Reporte"
+                                             icon="pi pi-plus"
+                                             action="#{reporteVecinoControllerWeb.abrirModalCrear}"
+                                             update="formCrear"
+                                             oncomplete="PF('dlgCrear').show()"
+                                             styleClass="p-button-success"
+                                             process="@this"/>
+                        </div>
+
+                        <p:dataTable id="tablaMisReportes"
+                                     value="#{reporteVecinoControllerWeb.misReportes}"
+                                     var="r"
+                                     paginator="true"
+                                     rows="10"
+                                     emptyMessage="No tienes reportes creados">
+
+                            <p:column headerText="Código" style="width: 80px;">
+                                <h:outputText value="#{r.reportId}"/>
+                            </p:column>
+
+                            <p:column headerText="Descripción">
+                                <h:outputText value="#{r.description}"/>
+                            </p:column>
+
+                            <p:column headerText="Zona" style="width: 100px;">
+                                <h:outputText value="#{r.zone}"/>
+                            </p:column>
+
+                            <p:column headerText="Tipo" style="width: 150px;">
+                                <h:outputText value="#{r.reportType.nameReportType}"/>
+                            </p:column>
+
+                            <p:column headerText="Estado" style="width: 120px;">
+                                <p:badge value="#{r.state != null ? r.state.name : 'PENDIENTE'}"
+                                         severity="#{reporteVecinoControllerWeb.getSeverity(r.state != null ? r.state.name : 'PENDIENTE')}"/>
+                            </p:column>
+
+                            <p:column headerText="Acciones" style="width: 150px;">
+                                <p:commandButton value="Calificar"
+                                                 icon="pi pi-star"
+                                                 actionListener="#{reporteVecinoControllerWeb.abrirModalCalificar(r)}"
+                                                 update="formCalificar"
+                                                 oncomplete="PF('dlgCalificar').show()"
+                                                 process="@this"
+                                                 styleClass="p-button-warning p-button-sm"/>
+                            </p:column>
+                        </p:dataTable>
+                    </p:tab>
+
+                    <!-- Tab 2: REPORTES DE MI ZONA -->
+                    <p:tab title="Reportes de Mi Zona">
+                        <f:event type="preRenderView"
+                                 listener="#{reporteVecinoControllerWeb.cargarReportesZona()}"/>
+
+                        <p:dataTable id="tablaReportesZona"
+                                     value="#{reporteVecinoControllerWeb.reportesZona}"
+                                     var="r"
+                                     paginator="true"
+                                     rows="10"
+                                     emptyMessage="No hay reportes en tu zona">
+
+                            <p:column headerText="Código" style="width: 80px;">
+                                <h:outputText value="#{r.reportId}"/>
+                            </p:column>
+
+                            <p:column headerText="Vecino" style="width: 150px;">
+                                <h:outputText value="#{r.neighbor != null ? r.neighbor.nameNeighbor : 'Anónimo'}"/>
+                            </p:column>
+
+                            <p:column headerText="Descripción">
+                                <h:outputText value="#{r.description}"/>
+                            </p:column>
+
+                            <p:column headerText="Estado" style="width: 120px;">
+                                <p:badge value="#{r.state != null ? r.state.name : 'PENDIENTE'}"
+                                         severity="#{reporteVecinoControllerWeb.getSeverity(r.state != null ? r.state.name : 'PENDIENTE')}"/>
+                            </p:column>
+
+                            <p:column headerText="Personal" style="width: 150px;">
+                                <h:outputText value="#{r.staff != null ? r.staff.name : '-'}"/>
+                            </p:column>
+
+                            <p:column headerText="Acciones" style="width: 150px;">
+                                <p:commandButton value="Calificar"
+                                                 icon="pi pi-star"
+                                                 process="@this"
+                                                 update="formCalificar"
+                                                 styleClass="p-button-warning p-button-sm">
+                                    <f:setPropertyActionListener value="#{r}"
+                                                                 target="#{reporteVecinoControllerWeb.reporteCalificar}"/>
+                                    <p:ajax event="click"
+                                            listener="#{reporteVecinoControllerWeb.abrirModalCalificar(r)}"
+                                            update="formCalificar"
+                                            oncomplete="PF('dlgCalificar').show()"/>
+                                </p:commandButton>
+                            </p:column>
+                        </p:dataTable>
+                    </p:tab>
+                </p:tabView>
+            </h:form>
+
+            <!-- DIALOG: CREAR REPORTE -->
+            <h:form id="formCrear">
+                <p:dialog header="Crear Nuevo Reporte"
+                          widgetVar="dlgCrear"
+                          modal="true"
+                          width="600"
+                          closable="true"
+                          showEffect="fade"
+                          hideEffect="fade">
+
+                    <p:messages id="messagesCrear"/>
+
+                    <div style="padding: 20px;">
+                        <div class="dialog-field">
+                            <label for="descripcion">Descripción</label>
+                            <p:inputTextarea id="descripcion"
+                                             value="#{reporteVecinoControllerWeb.descripcionNuevo}"
+                                             rows="5"
+                                             placeholder="Describa el problema..."
+                                             required="true"
+                                             requiredMessage="La descripción es obligatoria"
+                                             maxlength="500"
+                                             style="width: 100%;"/>
+                        </div>
+
+                        <div class="dialog-field">
+                            <label for="zona">Zona</label>
+                            <p:selectOneMenu id="zona"
+                                             value="#{reporteVecinoControllerWeb.zonaNuevo}"
+                                             required="true"
+                                             requiredMessage="Debe seleccionar una zona"
+                                             style="width: 100%;">
+                                <f:selectItem itemLabel="Seleccione zona" itemValue="#{null}" noSelectionOption="true"/>
+                                <f:selectItems value="#{reporteVecinoControllerWeb.zonasDisponibles}"/>
+                            </p:selectOneMenu>
+                        </div>
+
+                        <div class="dialog-field">
+                            <label for="tipoReporte">Tipo de Reporte</label>
+                            <p:selectOneMenu id="tipoReporte"
+                                             value="#{reporteVecinoControllerWeb.tipoReporteNuevo}"
+                                             required="true"
+                                             requiredMessage="Debe seleccionar un tipo"
+                                             style="width: 100%;">
+                                <f:selectItem itemLabel="Seleccione tipo" itemValue="#{null}" noSelectionOption="true"/>
+                                <f:selectItems value="#{reporteVecinoControllerWeb.tiposReporte}"
+                                               var="tipo"
+                                               itemLabel="#{tipo.nameReportType}"
+                                               itemValue="#{tipo.reportTypeId}"/>
+                            </p:selectOneMenu>
+                        </div>
+
+                        <div class="dialog-buttons">
+                            <p:commandButton value="Cancelar"
+                                             icon="pi pi-times"
+                                             onclick="PF('dlgCrear').hide(); return false;"
+                                             styleClass="p-button-secondary"/>
+                            <p:commandButton value="Crear Reporte"
+                                             icon="pi pi-check"
+                                             action="#{reporteVecinoControllerWeb.crearReporte}"
+                                             update="formCrear formReportes:messages formReportes:tablaMisReportes"
+                                             oncomplete="if (args &amp;&amp; !args.validationFailed) PF('dlgCrear').hide();"
+                                             styleClass="p-button-success"/>
+                        </div>
+                    </div>
+                </p:dialog>
+            </h:form>
+
+            <!-- DIALOG: CALIFICAR -->
+            <h:form id="formCalificar">
+                <p:dialog header="Calificar Reporte"
+                          widgetVar="dlgCalificar"
+                          modal="true"
+                          width="400"
+                          closable="true"
+                          showEffect="fade"
+                          hideEffect="fade">
+
+                    <p:messages id="messagesCalificar"/>
+
+                    <div style="padding: 20px;">
+                        <p style="color: #666; margin-bottom: 20px;">
+                            Reporte: <strong>##{reporteVecinoControllerWeb.reporteCalificar != null ? reporteVecinoControllerWeb.reporteCalificar.reportId : ''}</strong>
+                        </p>
+
+                        <div class="dialog-field" style="text-align: center;">
+                            <label for="rating" style="display: block; margin-bottom: 15px;">Calificación (1-5)</label>
+                            <p:rating id="rating"
+                                      value="#{reporteVecinoControllerWeb.valorCalificacion}"
+                                      stars="5"
+                                      cancel="false"
+                                      required="true"
+                                      requiredMessage="Debe seleccionar una calificación"/>
+                        </div>
+
+                        <div class="dialog-buttons">
+                            <p:commandButton value="Cancelar"
+                                             icon="pi pi-times"
+                                             onclick="PF('dlgCalificar').hide(); return false;"
+                                             styleClass="p-button-secondary"/>
+                            <p:commandButton value="Guardar Calificación"
+                                             icon="pi pi-check"
+                                             action="#{reporteVecinoControllerWeb.guardarCalificacion}"
+                                             update="formCalificar formReportes:messages"
+                                             oncomplete="if (args &amp;&amp; !args.validationFailed) PF('dlgCalificar').hide();"
+                                             styleClass="p-button-success"/>
+                        </div>
+                    </div>
+                </p:dialog>
+            </h:form>
+        </div>
+    </h:body>
+</h:html>

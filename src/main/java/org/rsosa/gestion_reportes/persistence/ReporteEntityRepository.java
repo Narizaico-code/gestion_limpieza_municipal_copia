@@ -94,17 +94,17 @@ public class ReporteEntityRepository implements ReporteRepository {
 
         Reporte reporte = this.reporteMapper.toEntity(reporteDto);
 
-        if (reporteDto.neighbor() != null && reporteDto.neighbor().neighbor_id() != null) {
-            Vecino vecinoCompleto = this.crudVecinoEntity.findById(reporteDto.neighbor().neighbor_id())
-                    .orElseThrow(() -> new VecinoNoExisteException("Vecino con ID " + reporteDto.neighbor().neighbor_id() + " no encontrado."));
+        if (reporteDto.neighbor() != null && reporteDto.neighbor().neighborId() != null) {
+            Vecino vecinoCompleto = this.crudVecinoEntity.findById(reporteDto.neighbor().neighborId())
+                    .orElseThrow(() -> new VecinoNoExisteException("Vecino con ID " + reporteDto.neighbor().neighborId() + " no encontrado."));
             reporte.setVecino(vecinoCompleto);
         } else {
             throw new RuntimeException("El ID del Vecino es obligatorio para crear un reporte.");
         }
 
-        if (reporteDto.report_type() != null && reporteDto.report_type().report_type_id() != null) {
-            TipoReporte tipoReporteCompleto = this.crudTipoReporteEntity.findById(reporteDto.report_type().report_type_id())
-                    .orElseThrow(() -> new CatalogoInvalidoException("Tipo de Reporte con ID " + reporteDto.report_type().report_type_id() + " no encontrado."));
+        if (reporteDto.reportType() != null && reporteDto.reportType().reportTypeId() != null) {
+            TipoReporte tipoReporteCompleto = this.crudTipoReporteEntity.findById(reporteDto.reportType().reportTypeId())
+                    .orElseThrow(() -> new CatalogoInvalidoException("Tipo de Reporte con ID " + reporteDto.reportType().reportTypeId() + " no encontrado."));
             reporte.setTipoReporte(tipoReporteCompleto);
         } else {
             throw new RuntimeException("El ID del Tipo de Reporte es obligatorio para crear un reporte.");
@@ -136,8 +136,8 @@ public class ReporteEntityRepository implements ReporteRepository {
         Reporte reporte = this.crudReporteEntity.findById(id)
                 .orElseThrow(() -> new ReporteNoExisteException(id));
 
-        if (modReporteDto.staff() != null && modReporteDto.staff().personal_id() != null) {
-            Long codigoNuevoPersonal = modReporteDto.staff().personal_id();
+        if (modReporteDto.staff() != null && modReporteDto.staff().personalId() != null) {
+            Long codigoNuevoPersonal = modReporteDto.staff().personalId();
 
             Personal nuevoPersonal = this.crudPersonalEntity.findById(codigoNuevoPersonal)
                     .orElseThrow(() -> new PersonalNoExisteException(codigoNuevoPersonal));
@@ -195,9 +195,9 @@ public class ReporteEntityRepository implements ReporteRepository {
             reporte.setEstado(estadoAsignado);
         }
 
-        if (modReporteDto.state() != null && modReporteDto.state().state_id() != null) {
-            Estado nuevoEstado = this.crudEstadoEntity.findById(modReporteDto.state().state_id())
-                    .orElseThrow(() -> new EstadoInvalidoException("El código de Estado " + modReporteDto.state().state_id() + " es inválido."));
+        if (modReporteDto.state() != null && modReporteDto.state().stateId() != null) {
+            Estado nuevoEstado = this.crudEstadoEntity.findById(modReporteDto.state().stateId())
+                    .orElseThrow(() -> new EstadoInvalidoException("El código de Estado " + modReporteDto.state().stateId() + " es inválido."));
             reporte.setEstado(nuevoEstado);
         }
 

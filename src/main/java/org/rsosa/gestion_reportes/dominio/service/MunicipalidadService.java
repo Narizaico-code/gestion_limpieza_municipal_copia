@@ -8,7 +8,6 @@ import java.util.List;
 
 @Service
 public class MunicipalidadService {
-
     private final MunicipalidadRepository municipalidadRepository;
 
     public MunicipalidadService(MunicipalidadRepository municipalidadRepository) {
@@ -19,16 +18,16 @@ public class MunicipalidadService {
         return this.municipalidadRepository.obtenerTodo();
     }
 
-    public MunicipalidadDto obtenerMunicipalidadPorId(Long id) {
+    public MunicipalidadDto obtenerPorCodigo(Long id) {
         return this.municipalidadRepository.obtenerMunicipalidadPorId(id);
     }
 
-    public MunicipalidadDto guardarMunicipalidad(MunicipalidadDto municipalidadDto) {
-        return this.municipalidadRepository.guardarMunicipalidad(municipalidadDto);
+    public MunicipalidadDto guardarMunicipalidad(MunicipalidadDto dto) {
+        return this.municipalidadRepository.guardarMunicipalidad(dto);
     }
 
-    public MunicipalidadDto actualizarMunicipalidad(Long id, MunicipalidadDto municipalidadDto) {
-        return this.municipalidadRepository.actualizarMunicipalidad(id, municipalidadDto);
+    public MunicipalidadDto actualizarMunicipalidad(Long id, MunicipalidadDto dto) {
+        return this.municipalidadRepository.actualizarMunicipalidad(id, dto);
     }
 
     public void eliminarMunicipalidad(Long id) {

@@ -17,13 +17,13 @@ import java.util.List;
         AdministradorMapper.class
 })
 public interface ReporteMapper {
-    @Mapping(source = "codigoReporte", target = "report_id")
+    @Mapping(source = "codigoReporte", target = "reportId")
     @Mapping(source = "descripcion", target = "description")
     @Mapping(source = "zona", target = "zone")
     @Mapping(source = "estado", target = "state")
     @Mapping(source = "vecino", target = "neighbor")
     @Mapping(source = "personalAsignado", target = "staff")
-    @Mapping(source = "tipoReporte", target = "report_type")
+    @Mapping(source = "tipoReporte", target = "reportType")
     ReporteDto toDto(Reporte entity);
 
     List<ReporteDto> toDto(Iterable<Reporte> entities);

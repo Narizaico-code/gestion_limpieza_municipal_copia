@@ -8,7 +8,6 @@ import java.util.List;
 
 @Service
 public class AspiranteService {
-
     private final AspiranteRepository aspiranteRepository;
 
     public AspiranteService(AspiranteRepository aspiranteRepository) {
@@ -21,19 +20,26 @@ public class AspiranteService {
 
     public AspiranteDto obtenerPorCodigo(Long id) {
         return this.aspiranteRepository.obtenerPorCodigo(id);
+
     }
 
-    public AspiranteDto guardarAspirante(AspiranteDto aspiranteDto) {
+    public List<AspiranteDto> obtenerPorContratacion(Long codigo){
+        return this.aspiranteRepository.obtenerPorContratacion(codigo);
+    }
+
+    public AspiranteDto contratarAspirante(Long codigo){
+        return this.aspiranteRepository.contratarAspirante(codigo);
+    }
+
+    public AspiranteDto guardarAspirante(AspiranteDto aspiranteDto){
         return this.aspiranteRepository.guardarAspirante(aspiranteDto);
     }
 
-    public AspiranteDto actualizarAspirante(Long id, AspiranteDto aspiranteDto) {
-        return this.aspiranteRepository.actualizarAspirante(id, aspiranteDto);
+    public AspiranteDto actualizarAspirante(Long codigo, AspiranteDto aspiranteDto){
+        return this.aspiranteRepository.actualizarAspirante(codigo, aspiranteDto);
     }
 
-    public void eliminarAspirante(Long id) {
-        this.aspiranteRepository.eliminarAspirante(id);
+    public void eliminarAspirante(Long codigo){
+        this.aspiranteRepository.eliminarAspirante(codigo);
     }
-
-
 }

@@ -38,7 +38,7 @@ public class ContratacionEntityRepository implements ContratacionRepository {
 
     @Override
     public ContratacionDto guardarContratacion(ContratacionDto contratacionDto) {
-        Long idMunicipalidad = contratacionDto.municipality().municipality_id();
+        Long idMunicipalidad = contratacionDto.municipality().municipalityId();
         Municipalidad municipalidad = this.crudMunicipalidadEntity.findById(idMunicipalidad).orElseThrow(() -> new RuntimeException("La municipalidad con id " + idMunicipalidad + " no sirve"));
         Contratacion contratacion = this.contratacionMapper.toEntity(contratacionDto);
         contratacion.setMunicipalidad(municipalidad);
@@ -51,7 +51,7 @@ public class ContratacionEntityRepository implements ContratacionRepository {
         Contratacion contratacion = this.crudContratacionEntity.findById(id)
                 .orElseThrow(() -> new CatalogoInvalidoException("Contratación con código " + id + " no existe."));
         this.contratacionMapper.updateEntityFromDto(contratacionDto, contratacion);
-        Long idMunicipalidad = contratacionDto.municipality().municipality_id();
+        Long idMunicipalidad = contratacionDto.municipality().municipalityId();
         Municipalidad municipalidad = this.crudMunicipalidadEntity.findById(idMunicipalidad).orElseThrow(() -> new RuntimeException("La municipalidad con id " + idMunicipalidad + " no sirve"));
         contratacion.setMunicipalidad(municipalidad);
         contratacion = this.crudContratacionEntity.save(contratacion);

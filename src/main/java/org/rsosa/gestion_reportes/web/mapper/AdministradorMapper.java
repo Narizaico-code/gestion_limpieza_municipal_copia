@@ -8,14 +8,14 @@ import java.util.List;
 
 @Mapper(componentModel = "spring")
 public interface AdministradorMapper {
-    @Mapping(source = "codigoAdmin", target = "admin_id")
+    @Mapping(source = "codigoAdmin", target = "adminId")
     @Mapping(source = "usuario", target = "username")
     @Mapping(source = "contraseña", target = "password")
     @Mapping(source = "nombreCompleto", target = "fullName")
     AdministradorDto toDto(Administrador entity);
     List<AdministradorDto> toDto(Iterable<Administrador> entities);
 
-    @Mapping(source = "admin_id", target = "codigoAdmin")
+    @Mapping(source = "adminId", target = "codigoAdmin")
     @Mapping(source = "username", target = "usuario")
     @Mapping(source = "password", target = "contraseña")
     @Mapping(source = "fullName", target = "nombreCompleto")

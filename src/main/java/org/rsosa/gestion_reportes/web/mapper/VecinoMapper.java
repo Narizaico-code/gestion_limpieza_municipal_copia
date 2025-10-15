@@ -12,16 +12,18 @@ import java.util.List;
 
 @Mapper(componentModel = "spring")
 public interface VecinoMapper {
-    @Mapping(source = "codigoVecino", target = "neighbor_id")
-    @Mapping(source = "nombre", target = "name_neighbor")
-    @Mapping(source = "telefono", target = "phone_number")
+    @Mapping(source = "codigoVecino", target = "neighborId")
+    @Mapping(source = "nombre", target = "nameNeighbor")
+    @Mapping(source = "contrasena", target = "password")
+    @Mapping(source = "telefono", target = "phoneNumber")
     @Mapping(source = "correoElectronico", target = "email")
     VecinoDto toDto(Vecino entity);
     List<VecinoDto> toDto(Iterable<Vecino> entities);
 
-    @Mapping(source = "neighbor_id", target = "codigoVecino")
-    @Mapping(source = "name_neighbor" , target = "nombre")
-    @Mapping(source = "phone_number", target = "telefono")
+    @Mapping(source = "neighborId", target = "codigoVecino")
+    @Mapping(source = "nameNeighbor" , target = "nombre")
+    @Mapping(source = "password", target = "contrasena")
+    @Mapping(source = "phoneNumber", target = "telefono")
     @Mapping(source = "email", target = "correoElectronico")
     Vecino toEntity(VecinoDto vecinoDto);
     void updateEntityFromDto(VecinoDto vecinoDto, @MappingTarget Vecino vecino);

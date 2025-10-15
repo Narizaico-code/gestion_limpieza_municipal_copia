@@ -1,12 +1,9 @@
-
-// ============================================
-// 4. AdminReporteControllerWeb.java
-// ============================================
 package org.rsosa.gestion_reportes.web.controller;
 
 import jakarta.annotation.PostConstruct;
 import jakarta.faces.application.FacesMessage;
 import jakarta.faces.context.FacesContext;
+import jakarta.servlet.http.HttpSession;
 import lombok.Data;
 import org.rsosa.gestion_reportes.dominio.dto.*;
 import org.rsosa.gestion_reportes.dominio.service.ReporteService;
@@ -19,10 +16,10 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Component("adminReporteControllerWeb")
+@Component("reporteAdminControllerWeb")
 @Scope("view")
 @Data
-public class AdminReporteControllerWeb implements Serializable {
+public class ReporteAdminControllerWeb implements Serializable {
 
     @Autowired
     private ReporteService reporteService;
@@ -30,34 +27,66 @@ public class AdminReporteControllerWeb implements Serializable {
     @Autowired
     private TrabajadorMunicipalidadEntityRepository trabajadorRepository;
 
+    private AdministradorDto adminLogueado;
+    private String zonaAdmin;
+
     private List<ReporteDto> reportes;
     private ReporteDto reporteSeleccionado;
-    private ReporteDto reporteDetalle;
 
     private String filtroEstado;
     private String filtroVecino;
+
     private Long personalSeleccionado;
     private List<PersonalDto> personalDisponible;
 
-    private Long reporteId;
-
     @PostConstruct
     public void init() {
+        cargarAdminLogueado();
         cargarReportes();
     }
 
+    private void cargarAdminLogueado() {
+        HttpSession session = (HttpSession) FacesContext.getCurrentInstance()
+                .getExternalContext().getSession(false);
+        if (session != null) {
+            this.adminLogueado = (AdministradorDto) session.getAttribute("adminLogueado");
+            this.zonaAdmin = (String) session.getAttribute("zonaAdmin");
+        }
+    }
+
     public void cargarReportes() {
-        this.reportes = reporteService.obtenerTodo();
+        if (zonaAdmin != null) {
+            this.reportes = reporteService.obtenerTodo().stream()
+                    .filter(r -> r.zone().equals(zonaAdmin))
+                    .collect(Collectors.toList());
+        } else {
+            this.reportes = reporteService.obtenerTodo();
+        }
     }
 
     public void aplicarFiltros() {
-        if (filtroEstado != null && !filtroEstado.isEmpty()) {
-            this.reportes = reporteService.obtenerReportesPorEstado(filtroEstado);
-        } else if (filtroVecino != null && !filtroVecino.isEmpty()) {
-            this.reportes = reporteService.obtenerReportesPorVecino(filtroVecino);
-        } else {
-            cargarReportes();
+        List<ReporteDto> todos = reporteService.obtenerTodo();
+
+        if (zonaAdmin != null) {
+            todos = todos.stream()
+                    .filter(r -> r.zone().equals(zonaAdmin))
+                    .collect(Collectors.toList());
         }
+
+        if (filtroEstado != null && !filtroEstado.isEmpty()) {
+            todos = todos.stream()
+                    .filter(r -> r.state().name().equals(filtroEstado))
+                    .collect(Collectors.toList());
+        }
+
+        if (filtroVecino != null && !filtroVecino.isEmpty()) {
+            todos = todos.stream()
+                    .filter(r -> r.neighbor() != null &&
+                            r.neighbor().nameNeighbor().contains(filtroVecino))
+                    .collect(Collectors.toList());
+        }
+
+        this.reportes = todos;
     }
 
     public void limpiarFiltros() {
@@ -86,18 +115,14 @@ public class AdminReporteControllerWeb implements Serializable {
 
             reporteService.actualizarReporte(reporteSeleccionado.reportId(), modDto);
             addMessage(FacesMessage.SEVERITY_INFO, "Éxito", "Personal asignado correctamente");
-            aplicarFiltros();
+            cargarReportes();
         } catch (Exception e) {
             addMessage(FacesMessage.SEVERITY_ERROR, "Error", e.getMessage());
         }
     }
 
-    public void cargarDetalle() {
-        this.reporteDetalle = reporteService.obtenerReportePorCodigo(reporteId);
-    }
-
-    public String verDetalle(Long id) {
-        return "/admin/reporteDetalle?faces-redirect=true&id=" + id;
+    public boolean puedeAsignar(ReporteDto reporte) {
+        return "PENDIENTE".equals(reporte.state().name());
     }
 
     protected void addMessage(FacesMessage.Severity severity, String summary, String detail) {
@@ -105,4 +130,3 @@ public class AdminReporteControllerWeb implements Serializable {
                 .addMessage(null, new FacesMessage(severity, summary, detail));
     }
 }
-

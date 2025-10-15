@@ -12,7 +12,7 @@ import java.util.List;
 
 @Mapper(componentModel = "spring", uses = {EstadoPersonalMapper.class})
 public interface PersonalMapper {
-    @Mapping(source = "codigoPersonal", target = "personal_id")
+    @Mapping(source = "codigoPersonal", target = "personalId")
     @Mapping(source = "nombre", target = "name")
     @Mapping(source = "apellido", target = "lastname")
     @Mapping(source = "telefono", target = "number")
@@ -22,7 +22,7 @@ public interface PersonalMapper {
 
     List<PersonalDto> toDto(List<Personal> entities);
 
-    @Mapping(source = "personal_id", target = "codigoPersonal")
+    @Mapping(source = "personalId", target = "codigoPersonal")
     @Mapping(source = "name", target = "nombre")
     @Mapping(source = "lastname", target = "apellido")
     @Mapping(source = "number", target = "telefono")

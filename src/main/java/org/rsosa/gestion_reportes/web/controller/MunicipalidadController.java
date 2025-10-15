@@ -24,7 +24,7 @@ public class MunicipalidadController {
 
     @GetMapping("{id}")
     public ResponseEntity<MunicipalidadDto> obtenerMunicipalidadPorId(@PathVariable Long id) {
-        var municipalidad = municipalidadService.obtenerMunicipalidadPorId(id);
+        var municipalidad = municipalidadService.obtenerPorCodigo(id);
         if (municipalidad == null) {
             return ResponseEntity.notFound().build();
         }

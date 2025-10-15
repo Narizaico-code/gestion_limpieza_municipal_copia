@@ -10,14 +10,14 @@ import java.util.List;
 
 @Mapper(componentModel = "spring", uses = {PersonalMapper.class, MunicipalidadMapper.class})
 public interface TrabajadorMunicipalidadMapper {
-    @Mapping(source = "codigoTrabajadorMunicipal", target = "municipal_worker_id")
+    @Mapping(source = "codigoTrabajadorMunicipal", target = "municipalWorkerId")
     @Mapping(source = "personal", target = "staff")
     @Mapping(source = "municipalidad", target = "municipality")
     TrabajadorMunicipalDto toDto(TrabajadorMunicipalidad entity);
 
     List<TrabajadorMunicipalDto> toDto(Iterable<TrabajadorMunicipalidad> entities);
 
-    @Mapping(source = "municipal_worker_id", target = "codigoTrabajadorMunicipal")
+    @Mapping(source = "municipalWorkerId", target = "codigoTrabajadorMunicipal")
     TrabajadorMunicipalidad toEntity(TrabajadorMunicipalDto dto);
 
     void updateEntityFromDto(TrabajadorMunicipalDto dto, @MappingTarget TrabajadorMunicipalidad entity);

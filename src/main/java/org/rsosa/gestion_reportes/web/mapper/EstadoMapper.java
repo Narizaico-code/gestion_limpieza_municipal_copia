@@ -12,7 +12,7 @@ import java.util.List;
 
 @Mapper(componentModel = "spring", uses = {NombreEstadoMapper.class})
 public interface EstadoMapper {
-    @Mapping(source = "codigoEstado", target = "state_id")
+    @Mapping(source = "codigoEstado", target = "stateId")
     @Mapping(source = "nombre", target = "name", qualifiedByName = "generarName")
     EstadoDto toDto(Estado entity);
     List<EstadoDto> toDto(Iterable<Estado> entities);

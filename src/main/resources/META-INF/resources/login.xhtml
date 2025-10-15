@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<h:html xmlns="http://www.w3.org/1999/xhtml"
+        xmlns:h="http://xmlns.jcp.org/jsf/html"
+        xmlns:f="http://xmlns.jcp.org/jsf/core"
+        xmlns:p="http://primefaces.org/ui">
+    <h:head>
+        <title>Login</title>
+        <link rel="stylesheet" href="https://unpkg.com/primeflex@latest/primeflex.css"/>
+        <link rel="stylesheet" href="https://unpkg.com/primeflex@latest/themes/primeone-dark.css"/>
+    </h:head>
+    <h:body style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh;">
+        <h:form>
+            <div class="h-screen flex align-items-center justify-content-center">
+                <div class="border-round-xl p-shadow-5 p-6 w-4"
+                     style="max-width: 400px; background-color: white;">
+
+                    <div class="text-center mb-4">
+                        <h2 class="text-3xl font-bold" style="color: #333;">Iniciar Sesión</h2>
+                        <p style="color: #666;">Ingrese sus credenciales</p>
+                    </div>
+
+                    <div class="flex flex-column gap-3">
+                        <h:outputLabel value="Email / Usuario" style="font-weight: bold;"/>
+                        <p:inputText id="email"
+                                     value="#{loginControllerWeb.emailOUsername}"
+                                     placeholder="ejemplo@correo.com o usuario"
+                                     required="true"
+                                     styleClass="w-full"/>
+
+                        <h:outputLabel value="Contraseña" style="font-weight: bold;"/>
+                        <p:password id="password"
+                                    value="#{loginControllerWeb.password}"
+                                    feedback="false"
+                                    placeholder="Ingresa tu contraseña"
+                                    required="true"
+                                    styleClass="w-full"/>
+
+                        <p:commandButton value="Ingresar"
+                                         icon="pi pi-sign-in"
+                                         action="#{loginControllerWeb.iniciarSesion}"
+                                         update="@form"
+                                         styleClass="p-button-lg w-full mt-3"/>
+
+                        <p:button value="Volver"
+                                  icon="pi pi-arrow-left"
+                                  outcome="index.xhtml"
+                                  styleClass="p-button-lg p-button-secondary w-full"/>
+                    </div>
+                </div>
+            </div>
+
+            <p:dialog id="modalExito"
+                      header="¡Éxito!"
+                      widgetVar="modalExito"
+                      modal="true"
+                      resizable="false"
+                      closable="false">
+                <h:outputText value="#{loginControllerWeb.mensajeExito}"/>
+            </p:dialog>
+
+            <p:dialog id="modalError"
+                      header="Error"
+                      widgetVar="modalError"
+                      modal="true"
+                      resizable="false">
+                <h:outputText value="#{loginControllerWeb.mensajeError}"/>
+                <f:facet name="footer">
+                    <p:commandButton value="Cerrar"
+                                     onclick="PF('modalError').hide()"
+                                     type="button"/>
+                </f:facet>
+            </p:dialog>
+        </h:form>
+    </h:body>
+</h:html>

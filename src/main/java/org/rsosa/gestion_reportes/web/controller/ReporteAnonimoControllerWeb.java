@@ -4,7 +4,9 @@ import jakarta.annotation.PostConstruct;
 import jakarta.faces.application.FacesMessage;
 import jakarta.faces.context.FacesContext;
 import lombok.Data;
-import org.rsosa.gestion_reportes.dominio.dto.*;
+import org.primefaces.PrimeFaces;
+import org.rsosa.gestion_reportes.dominio.dto.ReporteDto;
+import org.rsosa.gestion_reportes.dominio.dto.TipoReporteDto;
 import org.rsosa.gestion_reportes.dominio.service.ReporteService;
 import org.rsosa.gestion_reportes.dominio.service.TipoReporteService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,10 +17,10 @@ import java.io.Serializable;
 import java.util.Arrays;
 import java.util.List;
 
-@Component("reporteControllerWeb")
+@Component("reporteAnonimoControllerWeb")
 @Scope("view")
 @Data
-public class ReporteControllerWeb implements Serializable {
+public class ReporteAnonimoControllerWeb implements Serializable {
 
     @Autowired
     private ReporteService reporteService;
@@ -26,19 +28,14 @@ public class ReporteControllerWeb implements Serializable {
     @Autowired
     private TipoReporteService tipoReporteService;
 
-    private List<ReporteDto> misReportes;
-    private ReporteDto reporteDetalle;
-
-    // Para crear reporte
     private String descripcion;
-    private String zonaSeleccionada;
-    private Long tipoReporteSeleccionado;
+    private String zona;
+    private Long tipoReporteId;
 
     private List<String> zonasDisponibles;
     private List<TipoReporteDto> tiposReporte;
 
-    // Para ver detalle
-    private Long reporteId;
+    private String mensajeExito;
 
     @PostConstruct
     public void init() {
@@ -59,62 +56,31 @@ public class ReporteControllerWeb implements Serializable {
         this.tiposReporte = tipoReporteService.obtenerTodo();
     }
 
-    public void cargarMisReportes() {
-        VecinoDto vecino = getVecinoLogueado();
-        if (vecino != null) {
-            this.misReportes = reporteService.obtenerReportesPorVecino(vecino.nameNeighbor());
-        }
-    }
-
-    public String crearReporte() {
-        VecinoDto vecino = getVecinoLogueado();
-        if (vecino == null) {
-            return "/vecino/login?faces-redirect=true";
-        }
-
+    public void crearReporteAnonimo() {
         try {
             ReporteDto dto = new ReporteDto(
                     null,
                     descripcion,
-                    zonaSeleccionada,
+                    zona,
                     null,
-                    new VecinoDto(vecino.neighborId(), null,null, null, null),
                     null,
-                    new TipoReporteDto(tipoReporteSeleccionado, null)
+                    null,
+                    new TipoReporteDto(tipoReporteId, null)
             );
 
             reporteService.guardarReporte(dto);
-            addMessage(FacesMessage.SEVERITY_INFO, "Éxito", "Reporte creado exitosamente");
-            return "/vecino/dashboard?faces-redirect=true";
+            this.mensajeExito = "Reporte anónimo creado exitosamente. Código: #" + System.currentTimeMillis();
+            PrimeFaces.current().executeScript("PF('modalExito').show()");
+            limpiarFormulario();
         } catch (Exception e) {
             addMessage(FacesMessage.SEVERITY_ERROR, "Error", e.getMessage());
-            return null;
         }
     }
 
-    public void cargarDetalle() {
-        this.reporteDetalle = reporteService.obtenerReportePorCodigo(reporteId);
-    }
-
-    public String getSeverity(String estado) {
-        if (estado == null) return "secondary";
-        return switch (estado.toUpperCase()) {
-            case "PENDIENTE" -> "warning";
-            case "ASIGNADO" -> "info";
-            case "RESUELTO" -> "success";
-            default -> "secondary";
-        };
-    }
-
-    public String verDetalle(Long id) {
-        return "/vecino/reporteDetalle?faces-redirect=true&id=" + id;
-    }
-
-    private VecinoDto getVecinoLogueado() {
-        return (VecinoDto) FacesContext.getCurrentInstance()
-                .getExternalContext()
-                .getSessionMap()
-                .get("vecinoLogueado");
+    private void limpiarFormulario() {
+        this.descripcion = null;
+        this.zona = null;
+        this.tipoReporteId = null;
     }
 
     protected void addMessage(FacesMessage.Severity severity, String summary, String detail) {

@@ -22,10 +22,7 @@ public class MunicipalidadControllerWeb implements Serializable {
     private MunicipalidadService municipalidadService;
 
     private List<MunicipalidadDto> municipalidades;
-    private MunicipalidadDto nuevaMunicipalidad;
-
-    private String zona;
-    private String ubicacion;
+    private MunicipalidadDto municipalidadSeleccionada;
 
     @PostConstruct
     public void init() {
@@ -36,21 +33,36 @@ public class MunicipalidadControllerWeb implements Serializable {
         this.municipalidades = municipalidadService.obtenerTodo();
     }
 
-    public void crear() {
+    public void agregarMunicipalidad() {
+        this.municipalidadSeleccionada = new MunicipalidadDto(null, null, null);
+    }
+
+    public void guardarMunicipalidad() {
         try {
-            MunicipalidadDto dto = new MunicipalidadDto(null, zona, ubicacion);
-            municipalidadService.guardarMunicipalidad(dto);
-            addMessage(FacesMessage.SEVERITY_INFO, "Éxito", "Municipalidad creada exitosamente");
+            if (municipalidadSeleccionada.municipalityId() == null) {
+                municipalidadService.guardarMunicipalidad(municipalidadSeleccionada);
+                addMessage(FacesMessage.SEVERITY_INFO, "Éxito", "Municipalidad creada");
+            } else {
+                municipalidadService.actualizarMunicipalidad(
+                        municipalidadSeleccionada.municipalityId(),
+                        municipalidadSeleccionada
+                );
+                addMessage(FacesMessage.SEVERITY_INFO, "Éxito", "Municipalidad actualizada");
+            }
             cargarMunicipalidades();
-            limpiarFormulario();
         } catch (Exception e) {
             addMessage(FacesMessage.SEVERITY_ERROR, "Error", e.getMessage());
         }
     }
 
-    private void limpiarFormulario() {
-        this.zona = null;
-        this.ubicacion = null;
+    public void eliminarMunicipalidad() {
+        try {
+            municipalidadService.eliminarMunicipalidad(municipalidadSeleccionada.municipalityId());
+            addMessage(FacesMessage.SEVERITY_INFO, "Éxito", "Municipalidad eliminada");
+            cargarMunicipalidades();
+        } catch (Exception e) {
+            addMessage(FacesMessage.SEVERITY_ERROR, "Error", e.getMessage());
+        }
     }
 
     protected void addMessage(FacesMessage.Severity severity, String summary, String detail) {
@@ -58,4 +70,3 @@ public class MunicipalidadControllerWeb implements Serializable {
                 .addMessage(null, new FacesMessage(severity, summary, detail));
     }
 }
-

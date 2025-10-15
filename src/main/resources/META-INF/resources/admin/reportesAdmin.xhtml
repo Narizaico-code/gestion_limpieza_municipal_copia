@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<h:html xmlns="http://www.w3.org/1999/xhtml"
+        xmlns:h="http://xmlns.jcp.org/jsf/html"
+        xmlns:f="http://xmlns.jcp.org/jsf/core"
+        xmlns:p="http://primefaces.org/ui">
+    <h:head>
+        <title>Gestión de Reportes</title>
+        <link rel="stylesheet" href="https://unpkg.com/primeflex@latest/primeflex.css"/>
+        <link rel="stylesheet" href="https://unpkg.com/primeflex@latest/themes/primeone-dark.css"/>
+    </h:head>
+    <h:body style="background: #f5f5f5; min-height: 100vh;">
+        <div class="p-4">
+            <div class="border-round p-shadow-3 p-4 mb-4" style="background-color: white;">
+                <div class="flex justify-content-between align-items-center">
+                    <h1 class="text-3xl font-bold" style="color: #333;">
+                        <i class="pi pi-file-edit mr-2" style="color: #3498db;"></i>
+                        Gestión de Reportes
+                    </h1>
+                    <p:button value="Volver al Menú"
+                              icon="pi pi-arrow-left"
+                              outcome="menuAdmin.xhtml"
+                              styleClass="p-button-secondary"/>
+                </div>
+            </div>
+
+            <h:form id="formReportes">
+                <p:messages/>
+
+                <div class="border-round p-shadow-3 p-4 mb-3" style="background-color: white;">
+                    <h3>Filtros</h3>
+                    <div class="grid">
+                        <div class="col-12 md:col-4">
+                            <h:outputLabel value="Estado" style="font-weight: bold;"/>
+                            <p:selectOneMenu value="#{reporteAdminControllerWeb.filtroEstado}"
+                                             styleClass="w-full">
+                                <f:selectItem itemLabel="Todos" itemValue=""/>
+                                <f:selectItem itemLabel="PENDIENTE" itemValue="PENDIENTE"/>
+                                <f:selectItem itemLabel="ASIGNADO" itemValue="ASIGNADO"/>
+                                <f:selectItem itemLabel="RESUELTO" itemValue="RESUELTO"/>
+                            </p:selectOneMenu>
+                        </div>
+
+                        <div class="col-12 md:col-4">
+                            <h:outputLabel value="Vecino" style="font-weight: bold;"/>
+                            <p:inputText value="#{reporteAdminControllerWeb.filtroVecino}"
+                                         placeholder="Buscar por nombre"
+                                         styleClass="w-full"/>
+                        </div>
+
+                        <div class="col-12 md:col-4 flex align-items-end">
+                            <p:commandButton value="Filtrar"
+                                             icon="pi pi-search"
+                                             action="#{reporteAdminControllerWeb.aplicarFiltros()}"
+                                             update="tablaReportes"
+                                             styleClass="mr-2"/>
+                            <p:commandButton value="Limpiar"
+                                             icon="pi pi-filter-slash"
+                                             action="#{reporteAdminControllerWeb.limpiarFiltros()}"
+                                             update="@form"
+                                             styleClass="p-button-secondary"/>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="border-round p-shadow-3 p-4" style="background-color: white;">
+                    <p:dataTable id="tablaReportes"
+                                 value="#{reporteAdminControllerWeb.reportes}"
+                                 var="r"
+                                 paginator="true"
+                                 rows="15"
+                                 emptyMessage="No hay reportes">
+
+                        <p:column headerText="Código" style="width: 80px;">
+                            <h:outputText value="##{r.reportId}"/>
+                        </p:column>
+
+                        <p:column headerText="Vecino" style="width: 150px;">
+                            <h:outputText value="#{r.neighbor != null ? r.neighbor.nameNeighbor : 'Anónimo'}"/>
+                        </p:column>
+
+                        <p:column headerText="Descripción">
+                            <h:outputText value="#{r.description}"/>
+                        </p:column>
+
+                        <p:column headerText="Zona" style="width: 100px;">
+                            <h:outputText value="#{r.zone}"/>
+                        </p:column>
+
+                        <p:column headerText="Estado" style="width: 120px;">
+                            <p:badge value="#{r.state.name}"/>
+                        </p:column>
+
+                        <p:column headerText="Personal" style="width: 150px;">
+                            <h:outputText value="#{r.staff != null ? r.staff.name : '-'}"/>
+                        </p:column>
+
+                        <p:column headerText="Acciones" style="width: 150px;">
+                            <p:commandButton value="Asignar"
+                                             icon="pi pi-user-plus"
+                                             action="#{reporteAdminControllerWeb.abrirDialogoAsignar(r)}"
+                                             update=":dialogAsignar"
+                                             oncomplete="PF('dlgAsignar').show()"
+                                             disabled="#{!reporteAdminControllerWeb.puedeAsignar(r)}"
+                                             styleClass="p-button-success p-button-sm"/>
+                        </p:column>
+                    </p:dataTable>
+                </div>
+            </h:form>
+
+            <p:dialog id="dialogAsignar"
+                      header="Asignar Personal al Reporte"
+                      widgetVar="dlgAsignar"
+                      modal="true"
+                      width="500">
+                <h:form>
+                    <div class="flex flex-column gap-3 p-4">
+                        <p style="color: #666;">
+                            Reporte: <strong>##{reporteAdminControllerWeb.reporteSeleccionado.reportId}</strong><br/>
+                            Zona: <strong>#{reporteAdminControllerWeb.reporteSeleccionado.zone}</strong>
+                        </p>
+
+                        <h:outputLabel value="Seleccionar Personal" style="font-weight: bold;"/>
+                        <p:selectOneMenu value="#{reporteAdminControllerWeb.personalSeleccionado}"
+                                         styleClass="w-full">
+                            <f:selectItem itemLabel="Seleccione personal disponible" itemValue=""/>
+                            <f:selectItems value="#{reporteAdminControllerWeb.personalDisponible}"
+                                           var="p"
+                                           itemLabel="#{p.name} #{p.lastname} - #{p.state}"
+                                           itemValue="#{p.personalId}"/>
+                        </p:selectOneMenu>
+                    </div>
+
+                    <f:facet name="footer">
+                        <p:commandButton value="Asignar"
+                                         icon="pi pi-check"
+                                         action="#{reporteAdminControllerWeb.asignarPersonal()}"
+                                         update=":formReportes:tablaReportes"
+                                         oncomplete="PF('dlgAsignar').hide()"
+                                         styleClass="p-button-success"/>
+                        <p:commandButton value="Cancelar"
+                                         icon="pi pi-times"
+                                         onclick="PF('dlgAsignar').hide()"
+                                         type="button"
+                                         styleClass="p-button-secondary"/>
+                    </f:facet>
+                </h:form>
+            </p:dialog>
+        </div>
+    </h:body>
+</h:html>

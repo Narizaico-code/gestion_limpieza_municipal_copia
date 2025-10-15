@@ -5,7 +5,7 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 
 public record CalificacionDto(
-        Long calificacion_id,
+        Long calificacionId,
 
         @NotNull(message = "La calificación es obligatoria.")
         @Min(value = 1, message = "La calificación mínima es 1.")
@@ -18,4 +18,19 @@ public record CalificacionDto(
         @NotNull(message = "Debe asociar un vecino a la calificación.")
         VecinoDto neighbor
 ) {
+    public Long getCalificacionId() {
+        return calificacionId;
+    }
+
+    public Integer getValue() {
+        return value;
+    }
+
+    public ReporteDto getReport() {
+        return report;
+    }
+
+    public VecinoDto getNeighbor() {
+        return neighbor;
+    }
 }

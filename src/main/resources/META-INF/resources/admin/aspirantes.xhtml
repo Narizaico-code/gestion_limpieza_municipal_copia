@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<h:html xmlns="http://www.w3.org/1999/xhtml"
+        xmlns:h="http://xmlns.jcp.org/jsf/html"
+        xmlns:f="http://xmlns.jcp.org/jsf/core"
+        xmlns:p="http://primefaces.org/ui">
+    <h:head>
+        <title>Gestión de Aspirantes</title>
+        <link rel="stylesheet" href="https://unpkg.com/primeflex@latest/primeflex.css"/>
+        <link rel="stylesheet" href="https://unpkg.com/primeflex@latest/themes/primeone-dark.css"/>
+    </h:head>
+    <h:body style="background: #f5f5f5; min-height: 100vh;">
+        <div class="p-4">
+            <div class="border-round p-shadow-3 p-4 mb-4" style="background-color: white;">
+                <div class="flex justify-content-between align-items-center">
+                    <h1 class="text-3xl font-bold" style="color: #333;">
+                        <i class="pi pi-user-plus mr-2" style="color: #27ae60;"></i>
+                        Gestión de Aspirantes
+                    </h1>
+                    <p:button value="Volver al Menú"
+                              icon="pi pi-arrow-left"
+                              outcome="menuAdmin.xhtml"
+                              styleClass="p-button-secondary"/>
+                </div>
+            </div>
+
+            <h:form id="formAspirantes">
+                <p:messages/>
+
+                <div class="border-round p-shadow-3 p-4 mb-3" style="background-color: white;">
+                    <h3>Seleccionar Contratación</h3>
+                    <div class="flex align-items-end gap-2">
+                        <div style="flex: 1;">
+                            <p:selectOneMenu value="#{aspiranteAdminControllerWeb.contratacionSeleccionada}"
+                                             styleClass="w-full">
+                                <f:selectItem itemLabel="Seleccione contratación" itemValue=""/>
+                                <f:selectItems value="#{aspiranteAdminControllerWeb.contrataciones}"
+                                               var="c"
+                                               itemLabel="#{c.vacancy} - #{c.municipality.zone} - Vacantes: #{c.availableVaca}"
+                                               itemValue="#{c.hiringId}"/>
+                            </p:selectOneMenu>
+                        </div>
+                        <p:commandButton value="Cargar Aspirantes"
+                                         icon="pi pi-search"
+                                         action="#{aspiranteAdminControllerWeb.cargarAspirantesPorContratacion()}"
+                                         update="tablaAspirantes"
+                                         styleClass="p-button-primary"/>
+                    </div>
+                </div>
+
+                <div class="border-round p-shadow-3 p-4" style="background-color: white;">
+                    <p:dataTable id="tablaAspirantes"
+                                 value="#{aspiranteAdminControllerWeb.aspirantes}"
+                                 var="a"
+                                 paginator="true"
+                                 rows="10"
+                                 emptyMessage="Seleccione una contratación para ver aspirantes">
+
+                        <p:column headerText="ID">
+                            <h:outputText value="#{a.aspiranteId}"/>
+                        </p:column>
+
+                        <p:column headerText="Nombre">
+                            <h:outputText value="#{a.name}"/>
+                        </p:column>
+
+                        <p:column headerText="Apellido">
+                            <h:outputText value="#{a.surname}"/>
+                        </p:column>
+
+                        <p:column headerText="Teléfono">
+                            <h:outputText value="#{a.number}"/>
+                        </p:column>
+
+                        <p:column headerText="Email">
+                            <h:outputText value="#{a.email}"/>
+                        </p:column>
+
+                        <p:column headerText="Acciones" style="width: 150px;">
+                            <p:commandButton value="Contratar"
+                                             icon="pi pi-check"
+                                             action="#{aspiranteAdminControllerWeb.contratarAspirante(a.aspiranteId)}"
+                                             update="@form"
+                                             styleClass="p-button-success"/>
+                        </p:column>
+                    </p:dataTable>
+                </div>
+            </h:form>
+        </div>
+    </h:body>
+</h:html>

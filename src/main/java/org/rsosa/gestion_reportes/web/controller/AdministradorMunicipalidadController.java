@@ -45,8 +45,8 @@ public class AdministradorMunicipalidadController {
     public ResponseEntity<?> asignarAdminAMunicipalidad(@RequestBody @Valid AsignarAdminDto asignarDto) {
         try {
             AdministradorMunicipalidadDto resultado = this.repository.asignarAdminAMunicipalidad(
-                    asignarDto.admin_id(),
-                    asignarDto.municipalidad_id()
+                    asignarDto.adminId(),
+                    asignarDto.municipalidadId()
             );
             return ResponseEntity.status(HttpStatus.CREATED).body(resultado);
         } catch (CatalogoInvalidoException e) {

@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<h:html xmlns="http://www.w3.org/1999/xhtml"
+        xmlns:h="http://xmlns.jcp.org/jsf/html"
+        xmlns:p="http://primefaces.org/ui">
+    <h:head>
+        <title>Gestor de Reportes Municipales</title>
+        <link rel="stylesheet" href="https://unpkg.com/primeflex@latest/primeflex.css"/>
+        <link rel="stylesheet" href="https://unpkg.com/primeflex@latest/themes/primeone-dark.css"/>
+    </h:head>
+    <h:body style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh;">
+        <div class="h-screen flex align-items-center justify-content-center">
+            <div class="border-round-xl p-shadow-5 p-6"
+                 style="max-width: 500px; background-color: white;">
+                <h:form>
+                    <div class="text-center mb-5">
+                        <i class="pi pi-file-edit" style="font-size: 4rem; color: #667eea;"></i>
+                        <h1 class="text-4xl font-bold mt-3" style="color: #333;">
+                            Sistema de Reportes
+                        </h1>
+                        <p class="text-xl" style="color: #666;">
+                            Gestión Municipal
+                        </p>
+                    </div>
+
+                    <div class="flex flex-column gap-3">
+                        <p:button value="Iniciar Sesión"
+                                  outcome="login.xhtml"
+                                  icon="pi pi-sign-in"
+                                  styleClass="p-button-lg p-button-primary w-full"/>
+
+                        <p:button value="Crear Reporte Anónimo"
+                                  outcome="reporteAnonimo.xhtml"
+                                  icon="pi pi-plus-circle"
+                                  styleClass="p-button-lg p-button-success w-full"/>
+                    </div>
+                </h:form>
+            </div>
+        </div>
+    </h:body>
+</h:html>

@@ -5,8 +5,15 @@ import jakarta.validation.constraints.NotNull;
 import org.rsosa.gestion_reportes.dominio.EstadoEnum;
 
 public record EstadoDto(
-        Long state_id,
+        Long stateId,
         @NotNull(message = "El estado no puede estar vacio")
         EstadoEnum name
 ) {
+    public Long getStateId() {
+        return stateId;
+    }
+
+    public EstadoEnum getName() {
+        return name;
+    }
 }

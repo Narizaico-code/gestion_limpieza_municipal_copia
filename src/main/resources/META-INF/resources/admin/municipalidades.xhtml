@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<h:html xmlns="http://www.w3.org/1999/xhtml"
+        xmlns:h="http://xmlns.jcp.org/jsf/html"
+        xmlns:f="http://xmlns.jcp.org/jsf/core"
+        xmlns:p="http://primefaces.org/ui">
+    <h:head>
+        <title>Municipalidades</title>
+        <link rel="stylesheet" href="https://unpkg.com/primeflex@latest/primeflex.css"/>
+        <link rel="stylesheet" href="https://unpkg.com/primeflex@latest/themes/primeone-dark.css"/>
+    </h:head>
+    <h:body style="background: #f5f5f5; min-height: 100vh;">
+        <div class="p-4">
+            <div class="border-round p-shadow-3 p-4 mb-4" style="background-color: white;">
+                <div class="flex justify-content-between align-items-center">
+                    <h1 class="text-3xl font-bold" style="color: #333;">
+                        <i class="pi pi-building mr-2" style="color: #9b59b6;"></i>
+                        Gestión de Municipalidades
+                    </h1>
+                    <p:button value="Volver al Menú"
+                              icon="pi pi-arrow-left"
+                              outcome="menuAdmin.xhtml"
+                              styleClass="p-button-secondary"/>
+                </div>
+            </div>
+
+            <h:form id="formMunicipalidades">
+                <p:messages/>
+
+                <div class="border-round p-shadow-3 p-4" style="background-color: white;">
+                    <div class="mb-3">
+                        <p:commandButton value="Nueva Municipalidad"
+                                         icon="pi pi-plus"
+                                         action="#{municipalidadControllerWeb.agregarMunicipalidad()}"
+                                         update=":dialogMunic"
+                                         oncomplete="PF('dlgMunic').show()"
+                                         styleClass="p-button-success"/>
+                    </div>
+
+                    <p:dataTable value="#{municipalidadControllerWeb.municipalidades}"
+                                 var="m"
+                                 paginator="true"
+                                 rows="10"
+                                 emptyMessage="No hay municipalidades registradas">
+
+                        <p:column headerText="ID" style="width: 80px;">
+                            <h:outputText value="#{m.municipalityId}"/>
+                        </p:column>
+
+                        <p:column headerText="Zona">
+                            <h:outputText value="#{m.zone}"/>
+                        </p:column>
+
+                        <p:column headerText="Ubicación">
+                            <h:outputText value="#{m.location}"/>
+                        </p:column>
+
+                        <p:column headerText="Acciones" style="width: 200px;">
+                            <p:commandButton value="Editar"
+                                             icon="pi pi-pencil"
+                                             update=":dialogMunic"
+                                             oncomplete="PF('dlgMunic').show()"
+                                             styleClass="p-button-warning mr-2">
+                                <f:setPropertyActionListener value="#{m}"
+                                                             target="#{municipalidadControllerWeb.municipalidadSeleccionada}"/>
+                            </p:commandButton>
+
+                            <p:commandButton value="Eliminar"
+                                             icon="pi pi-trash"
+                                             oncomplete="PF('dlgEliminar').show()"
+                                             styleClass="p-button-danger">
+                                <f:setPropertyActionListener value="#{m}"
+                                                             target="#{municipalidadControllerWeb.municipalidadSeleccionada}"/>
+                            </p:commandButton>
+                        </p:column>
+                    </p:dataTable>
+                </div>
+            </h:form>
+
+            <p:dialog id="dialogMunic"
+                      header="Detalle de Municipalidad"
+                      widgetVar="dlgMunic"
+                      modal="true"
+                      width="500">
+                <h:form>
+                    <div class="flex flex-column gap-3 p-4">
+                        <h:outputLabel value="Zona" style="font-weight: bold;"/>
+                        <p:inputText value="#{municipalidadControllerWeb.municipalidadSeleccionada.zone}"
+                                     required="true"
+                                     placeholder="Ej: Zona 18"
+                                     styleClass="w-full"/>
+
+                        <h:outputLabel value="Ubicación" style="font-weight: bold;"/>
+                        <p:inputText value="#{municipalidadControllerWeb.municipalidadSeleccionada.location}"
+                                     required="true"
+                                     placeholder="Dirección o ubicación"
+                                     styleClass="w-full"/>
+                    </div>
+
+                    <f:facet name="footer">
+                        <p:commandButton value="Guardar"
+                                         icon="pi pi-check"
+                                         action="#{municipalidadControllerWeb.guardarMunicipalidad()}"
+                                         update=":formMunicipalidades"
+                                         oncomplete="PF('dlgMunic').hide()"
+                                         styleClass="p-button-success"/>
+                        <p:commandButton value="Cancelar"
+                                         icon="pi pi-times"
+                                         onclick="PF('dlgMunic').hide()"
+                                         type="button"
+                                         styleClass="p-button-secondary"/>
+                    </f:facet>
+                </h:form>
+            </p:dialog>
+
+            <p:confirmDialog widgetVar="dlgEliminar"
+                             message="¿Desea eliminar esta municipalidad?"
+                             header="Confirmar eliminación"
+                             severity="warn">
+                <h:form>
+                    <p:commandButton value="Sí"
+                                     icon="pi pi-check"
+                                     action="#{municipalidadControllerWeb.eliminarMunicipalidad()}"
+                                     update=":formMunicipalidades"
+                                     oncomplete="PF('dlgEliminar').hide()"
+                                     styleClass="p-button-danger"/>
+                    <p:commandButton value="No"
+                                     icon="pi pi-times"
+                                     onclick="PF('dlgEliminar').hide()"
+                                     type="button"
+                                     styleClass="p-button-secondary"/>
+                </h:form>
+            </p:confirmDialog>
+        </div>
+    </h:body>
+</h:html>

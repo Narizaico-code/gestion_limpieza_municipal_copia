@@ -17,6 +17,7 @@ public class Vecino {
     private Long codigoVecino;
     @Column(nullable = false)
     private String nombre;
+    private String contrasena;
     private String telefono;
     @Column(name = "correo_electronico",nullable = false, unique = true)
     private String correoElectronico;

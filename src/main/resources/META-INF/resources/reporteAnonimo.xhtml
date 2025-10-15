@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<h:html xmlns="http://www.w3.org/1999/xhtml"
+        xmlns:h="http://xmlns.jcp.org/jsf/html"
+        xmlns:f="http://xmlns.jcp.org/jsf/core"
+        xmlns:p="http://primefaces.org/ui">
+    <h:head>
+        <title>Reporte Anónimo</title>
+        <link rel="stylesheet" href="https://unpkg.com/primeflex@latest/primeflex.css"/>
+        <link rel="stylesheet" href="https://unpkg.com/primeflex@latest/themes/primeone-dark.css"/>
+    </h:head>
+    <h:body style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 2rem;">
+        <h:form id="formReporte">
+            <div class="flex justify-content-center">
+                <div class="border-round-xl p-shadow-5 p-5 w-6"
+                     style="max-width: 600px; background-color: white;">
+
+                    <div class="text-center mb-4">
+                        <i class="pi pi-file-edit" style="font-size: 3rem; color: #667eea;"></i>
+                        <h2 class="text-3xl font-bold mt-2" style="color: #333;">Crear Reporte Anónimo</h2>
+                        <p style="color: #666;">No es necesario iniciar sesión</p>
+                    </div>
+
+                    <p:messages/>
+
+                    <div class="flex flex-column gap-3">
+                        <h:outputLabel value="Descripción del Problema" style="font-weight: bold;"/>
+                        <p:inputTextarea value="#{reporteAnonimoControllerWeb.descripcion}"
+                                         rows="5"
+                                         placeholder="Describa detalladamente el problema..."
+                                         required="true"
+                                         maxlength="500"
+                                         styleClass="w-full"/>
+
+                        <h:outputLabel value="Zona" style="font-weight: bold;"/>
+                        <p:selectOneMenu value="#{reporteAnonimoControllerWeb.zona}"
+                                         required="true"
+                                         styleClass="w-full">
+                            <f:selectItem itemLabel="Seleccione una zona" itemValue=""/>
+                            <f:selectItems value="#{reporteAnonimoControllerWeb.zonasDisponibles}"/>
+                        </p:selectOneMenu>
+
+                        <h:outputLabel value="Tipo de Reporte" style="font-weight: bold;"/>
+                        <p:selectOneMenu value="#{reporteAnonimoControllerWeb.tipoReporteId}"
+                                         required="true"
+                                         styleClass="w-full">
+                            <f:selectItem itemLabel="Seleccione un tipo" itemValue=""/>
+                            <f:selectItems value="#{reporteAnonimoControllerWeb.tiposReporte}"
+                                           var="tipo"
+                                           itemLabel="#{tipo.nameReportType}"
+                                           itemValue="#{tipo.reportTypeId}"/>
+                        </p:selectOneMenu>
+
+                        <p:commandButton value="Crear Reporte"
+                                         icon="pi pi-check"
+                                         action="#{reporteAnonimoControllerWeb.crearReporteAnonimo}"
+                                         update="@form"
+                                         styleClass="p-button-lg p-button-success w-full mt-3"/>
+
+                        <p:button value="Volver al Inicio"
+                                  icon="pi pi-home"
+                                  outcome="index.xhtml"
+                                  styleClass="p-button-lg p-button-secondary w-full"/>
+                    </div>
+                </div>
+            </div>
+
+            <p:dialog header="¡Reporte Creado!"
+                      widgetVar="modalExito"
+                      modal="true"
+                      resizable="false">
+                <h:outputText value="#{reporteAnonimoControllerWeb.mensajeExito}"/>
+                <f:facet name="footer">
+                    <p:button value="Volver al Inicio"
+                              outcome="index.xhtml"
+                              styleClass="p-button-success"/>
+                </f:facet>
+            </p:dialog>
+        </h:form>
+    </h:body>
+</h:html>

@@ -13,10 +13,10 @@ import java.util.List;
 
 @Mapper(componentModel = "spring", uses = {MunicipalidadMapper.class})
 public interface ContratacionMapper {
-    @Mapping(source = "codigoContratacion", target = "hiring_id")
+    @Mapping(source = "codigoContratacion", target = "hiringId")
     @Mapping(source = "salario", target = "salary")
     @Mapping(source = "vacante", target = "vacancy")
-    @Mapping(source = "vacantesDisponibles", target = "available_vaca")
+    @Mapping(source = "vacantesDisponibles", target = "availableVaca")
     @Mapping(source = "municipalidad", target = "municipality")
     ContratacionDto toDto(Contratacion entity);
     List<ContratacionDto> toDto(Iterable<Contratacion> entities);

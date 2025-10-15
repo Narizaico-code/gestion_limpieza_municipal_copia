@@ -32,11 +32,11 @@ public class CalificacionEntityRepository implements CalificacionRepository {
 
     @Override
     public CalificacionDto guardarCalificacion(CalificacionDto dto) {
-        Long codigoReporte = dto.report().report_id();
+        Long codigoReporte = dto.report().reportId();
         Reporte reporte = crudReporteEntity.findById(codigoReporte)
                 .orElseThrow(() -> new ReporteNoExisteException(codigoReporte));
 
-        Long codigoVecino = dto.neighbor().neighbor_id();
+        Long codigoVecino = dto.neighbor().neighborId();
         Vecino vecino = crudVecinoEntity.findById(codigoVecino)
                 .orElseThrow(() -> new VecinoNoExisteException("Vecino con ID " + codigoVecino + " no encontrado."));
 
